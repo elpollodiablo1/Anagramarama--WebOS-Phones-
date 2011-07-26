@@ -1,0 +1,20 @@
+--- ../../anagramarama/src/dlb.c	2010-07-25 12:19:18.697878000 -0400
++++ dlb.c	2010-06-15 17:03:19.000000000 -0400
+@@ -45,7 +45,7 @@
+ // add a new word to the dictionary
+ struct dlb_node* current = *dlbHead;
+ struct dlb_node* previous = NULL;
+-int i=0;
++size_t i=0;
+ char letter;
+ int child = 0;
+ int sibling = 0;
+@@ -119,7 +119,7 @@
+ 
+ struct dlb_node* current = dlbHead;
+ struct dlb_node* previous = NULL;
+-int i=0;
++size_t i=0;
+ char letter;
+ int retval = 0;
+ 

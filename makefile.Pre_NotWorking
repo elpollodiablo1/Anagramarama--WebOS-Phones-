@@ -1,0 +1,33 @@
+SDL_LIBS ="-L%PALMPDK%\device\lib"
+CFLAGS2=-Wall -O2 "-I%PALMPDK%\include" "-I%PALMPDK%\include\SDL"
+LIBS=-lSDL -lGLESv2 -lSDL_mixer 
+MORELIBS=-Wl,--allow-shlib-undefined $(LIBS)
+TOOLPREFIX=arm-none-linux-gnueabi-
+CC=$(TOOLPREFIX)gcc
+CXX=$(TOOLPREFIX)g++
+LD==$(TOOLPREFIX)ld
+
+
+C_FILES=src\dlb.c src\linked.c src\sprite.c src\ag.c
+OBJ_FILES=src\dlb.o src\linked.o src\sprite.o src\ag.o
+OUT_FILE=ag
+DEVICEOPTS=-mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp
+
+all:ag
+
+ag: $(OBJ_FILES)
+	$(CC) $(DEVICEOPTS) -o $(OUT_FILE) $(OBJ_FILES) $(CFLAGS2) $(SDL_LIBS) $(MORELIBS)
+
+src/dlb.o: src/dlb.c 
+	$(CC) -c -o $@ $^
+
+src/linked.o: src/linked.c
+	$(CC) -c -o $@ $^
+
+src/sprite.o: src/sprite.c
+	$(CC) "-I%PALMPDK%\include" "-I%PALMPDK%\include\SDL" -c -o $@ $^
+
+src/ag.o: src/ag.c
+	$(CC) "-I%PALMPDK%\include" "-I%PALMPDK%\include\SDL" -c -o $@ $^ 
+
+

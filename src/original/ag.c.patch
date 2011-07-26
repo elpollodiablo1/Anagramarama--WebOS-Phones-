@@ -1,0 +1,230 @@
+@@ -72,6 +67,10 @@
+ #include "sprite.h"
+ #include "ag.h"
+ 
++#ifdef _MSC_VER
++#define snprintf _snprintf
++#endif
++
+ //module level variables for game control
+ char shuffle[]  = "£££££££";
+ char answer[]   = "£££££££";
+@@ -350,7 +345,7 @@
+ 
+ char*  newGuess;
+ char*  newRemain;
+-int    totalLen=0, guessLen=0, remainLen=0, i;
++int    totalLen=0, guessLen=0, remainLen=0;
+ 
+ 	// allocate space for our working variables
+ 	guessLen = strlen(*guess);
+@@ -374,6 +369,7 @@
+ 	}
+ 
+ 	if (strlen(newRemain)){
++        size_t i;
+ 		ag(&(*head), dlbHead, &newGuess, &newRemain);
+ 
+ 		for (i=totalLen-1;i>0;i--){
+@@ -470,18 +466,18 @@
+ SDL_Rect outerrect, innerrect, letterBankRect;
+ int i;
+ int numWords = 0;
+-int acrossOffset = 10;
++int acrossOffset = 70;
+ int numLetters = 0;
+ int listLetters = 0;
+ 
+ 	// width and height are always the same
+	outerrect.w = 14;//16
+	outerrect.h = 14;//16
+ 	outerrect.x = acrossOffset;
+	outerrect.y = 295;
+ 
+ 	letterBankRect.w = 10;
+	letterBankRect.h = 14;//16 probably use to pull from image
+ 	letterBankRect.y = 0;
+ 	letterBankRect.x = 0; // letter is chosen by 10*letter where a is 0
+ 
+@@ -883,7 +872,7 @@
+ // we'll display the total Score, this is the game score
+ 
+ char buffer [256];
+-int i;
++size_t i;
+ SDL_Rect fromrect, torect, blankRect;
+ 
+ 	blankRect.x = SCORE_WIDTH * 11;
+@@ -1199,8 +1181,8 @@
+ 
+ 	while(thisLetter != NULL){
+ 		if (thisLetter->box == SHUFFLE){
+-			thisLetter->toX = (whereinstr(shufflePos, thisLetter->index+1) * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE)) + BOX_START_X;
+-			thisLetter->index = whereinstr(shufflePos, thisLetter->index+1);
++			thisLetter->toX = (whereinstr(shufflePos, (char)(thisLetter->index+1)) * (GAME_LETTER_WIDTH + GAME_LETTER_SPACE)) + BOX_START_X;
++			thisLetter->index = whereinstr(shufflePos, (char)(thisLetter->index+1));
+ 		}
+ 
+ 		thisLetter = thisLetter->next;
+@@ -1584,10 +1557,19 @@
+ 
+ }
+ 
++static Uint32
++TimerCallback(Uint32 interval, void *param)
++{
++    SDL_UserEvent evt;
++    evt.type = SDL_USEREVENT;
++    evt.code = 0;
++    evt.data1 = 0;
++    evt.data2 = 0;
++    SDL_PushEvent((SDL_Event *)&evt);
++    return 0;
++}
+ 
+-
+-
+-/***********************************************************New Background images: In progress
++/***********************************************************
+ synopsis: a big while loop that runs the full length of the
+ 	  game, checks the game events and responds
+ 	  accordingly
+@@ -1623,7 +1605,10 @@
+ int done=0;
+ SDL_Event event;
+ int timeNow;
++SDL_TimerID timer;
++int timer_delay = 20;
+ 
++    timer = SDL_AddTimer(timer_delay, TimerCallback, NULL);
+ 	// main game loop
+ 	while (!done){
+ 
+@@ -1701,13 +1686,11 @@
+ 			//displayLetters(screen);
+ 
+ 			shuffleRemaining = 0;
+-
+-
+ 		}
+ 
+ 		if (clearGuess){
+ 			// clear the guess;
+-			if (clearWord(&(*letters)) > 0)
++			if (clearWord(letters) > 0)
+ 				Mix_PlayChannel(-1, getSound("clear"),0);
+ 
+ 			clearGuess = 0;
+@@ -1717,21 +1700,24 @@
+ 			done=1;
+ 		}
+ 
+-		while (SDL_PollEvent(&event))
++		while (SDL_WaitEvent(&event))
+ 		{
+-			switch (event.type) {
+-				case SDL_MOUSEBUTTONDOWN:
+-					clickDetect(event.button.button, event.button.x, event.button.y, screen, *head, &(*letters));
++			if (event.type == SDL_USEREVENT) {
++                timer_delay = anySpritesMoving(letters) ? 10 : 100;
++                moveSprites(&screen, letters, letterSpeed);
++                timer = SDL_AddTimer(timer_delay, TimerCallback, NULL);
+ 					break;
+-
+-				case SDL_KEYUP:
+-					handleKeyboardEvent(&event, *head, &(*letters));
+-				         break;
+-                                case SDL_QUIT:
++            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
++                clickDetect(event.button.button, event.button.x,
++                            event.button.y, screen, *head, letters);
++            } else if (event.type == SDL_KEYUP) {
++                handleKeyboardEvent(&event, *head, letters);
++            } else if (event.type == SDL_QUIT) {
+ 					done=1;
++                break;
+ 			}
++            moveSprites(&screen, letters, letterSpeed);
+                 }
+-		moveSprites(&screen, &(*letters), letterSpeed);
+         }
+ }
+ 
+@@ -1750,67 +1736,53 @@
+ ***********************************************************/
+ int main(int argc, char *argv[]){
+ 
+-char name[NAME_MAX+1];
+ struct node* head = NULL;
+ struct dlb_node* dlbHead = NULL;
+ SDL_Surface *screen;
+ struct sprite* letters = NULL;
+ //pthread_t audio;
+ 
++	// buffer sounds
++	int audio_rate = MIX_DEFAULT_FREQUENCY;
++	Uint16 audio_format = AUDIO_S16;
++	int audio_channels = 1;
++	int audio_buffers = 256;
++
++
+ 	// seed the random generator
+ 	srand(time(NULL));
+ 
+-	getcwd(name,NAME_MAX+1);// added Get Current working Directory
+-	printf("Working dir: %s\n",name);//added print working dir
+-
+-	if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO) < 0){
+-		printf("In SDL_init if statement\n");//added
++	if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0){
+ 		fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
+ 		exit(1);
+ 	}
+ 
+-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);// added
+-
+-	printf("before atexit SDL\n");//added
+ 	atexit(SDL_Quit);
+ 
+	//PDL_Init(0); //added by me
+	//atexit(PDL_Quit);// added by me
+-	printf("before Sceen\n");//added
+-
+	screen=SDL_SetVideoMode(0,0,0,0);//|SDL_FULLSCREEN);
+ 	if (screen == NULL)
+ 	{
+		printf("Unable to set 320x480 video: %s\n", SDL_GetError());
+ 		exit(1);
+ 	}
+ 
+-	//SDL_WM_SetCaption("Anagramarama", "ANAGRAMARAMA");
+-
+-	//PDL_Err PDL_ScreenTimeoutEnable(PDL_bool Enable);//added by me	
+ 	
+-	// buffer sounds
+-	int audio_rate = MIX_DEFAULT_FREQUENCY;
+-	Uint16 audio_format = AUDIO_S16;
+-	int audio_channels = 1;
+-	int audio_buffers = 256; //256
+-
+-	printf("before max_OpenAudio\n");//added
+ 	if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)){
+ 		printf("unable to open audio!\n");
+ 		exit(1);
+ 	}
+-	printf("before buffersounds\n");//added
++
+ 	bufferSounds(&soundCache);
+ 
+-	printf("before create dir\n");//added
+ 	// create dictionary
+ 	createDLBTree(&dlbHead);
+-	printf("before load images\n");//added
++
+ 	// cache in-game graphics
+	letterBank = SDL_LoadBMP("/media/cryptofs/apps/usr/palm/applications/com.cribme.ag/images/letterBank.bmp"); //  IMG_Load("images/letterBank.png"); 
+	smallLetterBank = IMG_Load("/media/cryptofs/apps/usr/palm/applications/com.cribme.ag/images/smallLetterBank.png"); //SDL_LoadBMP("images/smallLetterBank.bmp");
+	numberBank = SDL_LoadBMP("/media/cryptofs/apps/usr/palm/applications/com.cribme.ag/images/numberBank.bmp"); // IMG_Load("images/numberBank.png");
+ 
+ 	rootWord = malloc(sizeof(char)*9);
+ 	newGame(&head, dlbHead, screen, &letters);
