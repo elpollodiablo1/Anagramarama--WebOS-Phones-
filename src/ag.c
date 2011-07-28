@@ -700,6 +700,8 @@ char keyedLetter;
 
 	keyedLetter = event->key.keysym.sym;
 	printf("Keyed letter= %c\n", keyedLetter);
+ 	gamePaused=1;
+	
 	if (!gamePaused){
 
 		switch(keyedLetter){
