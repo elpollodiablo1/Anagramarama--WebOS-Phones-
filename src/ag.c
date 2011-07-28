@@ -699,7 +699,7 @@ struct sprite* current = *letters;
 char keyedLetter;
 
 	keyedLetter = event->key.keysym.sym;
-	printf("Keyed letter= %c", keyedLetter);
+	printf("Keyed letter= %c/n", keyedLetter);
 	if (!gamePaused){
 
 		switch(keyedLetter){
