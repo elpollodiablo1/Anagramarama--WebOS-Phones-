@@ -1785,7 +1785,7 @@ int timer_delay = 20;
 			done=1;
 		}
 
-		while (SDL_WaitEvent(&event)){
+		/*while (SDL_WaitEvent(&event)){
 			if (event.type == SDL_USEREVENT) {
                 timer_delay = anySpritesMoving(letters) ? 10 : 100;
                 moveSprites(&screen, letters, letterSpeed);
@@ -1801,12 +1801,12 @@ int timer_delay = 20;
             } else if (event.type == SDL_QUIT) {
 					done=1;
                 break;
-	    } /*else if (event.type == SDL_QUIT) {
-					done=1;
-                break;
-	    }*/
+	    } //else if (event.type == SDL_QUIT) {
+		//			done=1;
+                //break;
+	    //}
             moveSprites(&screen, letters, letterSpeed);
-                }
+                }*/
         }
 }
 
