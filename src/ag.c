@@ -699,7 +699,7 @@ struct sprite* current = *letters;
 char keyedLetter;
 
 	keyedLetter = event->key.keysym.sym;
-	printf("Keyed letter= %c\n", keyedLetter);
+	//printf("Keyed letter= %c\n", keyedLetter);
 	
 	if (!gamePaused){
 
@@ -1786,13 +1786,12 @@ int timer_delay = 20;
 		}
 
 		while (SDL_WaitEvent(&event))
-		fprintf(stderr, "Test WaitEvent");
 			if (event.type == SDL_USEREVENT) {
                 timer_delay = anySpritesMoving(letters) ? 10 : 100;
                 moveSprites(&screen, letters, letterSpeed);
                 timer = SDL_AddTimer(timer_delay, TimerCallback, NULL);
 					break;
-            } else if (event.type == SDL_MOUSEBUTTONDOWN) {i
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 clickDetect(event.button.button, event.button.x,
                             event.button.y, screen, *head, letters);
             } else if (event.type == SDL_KEYUP) {
