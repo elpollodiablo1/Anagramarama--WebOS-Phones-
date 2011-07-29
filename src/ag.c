@@ -1804,9 +1804,9 @@ int timer_delay = 20;
 	    } //else if (event.type == SDL_QUIT) {
 		//			done=1;
                 //break;
-	    //}
+	    //}*/
             moveSprites(&screen, letters, letterSpeed);
-                }*/
+                }
         }
 }
 
