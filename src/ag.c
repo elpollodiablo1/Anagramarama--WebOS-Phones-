@@ -1798,7 +1798,7 @@ int timer_delay = 20;
                 clickDetect(event.button.button, event.button.x,
                             event.button.y, screen, *head, letters);
             } else if (event.type == SDL_KEYUP) {
-		printf("key press")
+		printf("key press");
                 handleKeyboardEvent(&event, *head, letters);
             } else if (event.type == SDL_QUIT) {
 					done=1;
