@@ -1786,15 +1786,19 @@ int timer_delay = 20;
 		}
 
 		while (SDL_WaitEvent(&event)){
+			printf("Inside Wait Event");
 			if (event.type == SDL_USEREVENT) {
+		printf("SDL user evenr");
                 timer_delay = anySpritesMoving(letters) ? 10 : 100;
                 moveSprites(&screen, letters, letterSpeed);
                 timer = SDL_AddTimer(timer_delay, TimerCallback, NULL);
 					break;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+		printf("mouse click");
                 clickDetect(event.button.button, event.button.x,
                             event.button.y, screen, *head, letters);
             } else if (event.type == SDL_KEYUP) {
+		printf("key press")
                 handleKeyboardEvent(&event, *head, letters);
             } else if (event.type == SDL_QUIT) {
 					done=1;
