@@ -713,7 +713,7 @@ char keyedLetter;
 			case SDLK_RETURN:
 				//enter has been pressed
 				checkGuess(answer, head);
-				printf("enter Clicked");
+				//printf("enter Clicked");
 				break;
 			
 			case ' ':
@@ -1786,18 +1786,18 @@ int timer_delay = 20;
 		}
 
 		while (SDL_WaitEvent(&event)){
-			printf("Inside Wait Event\n");
+		//	printf("Inside Wait Event\n");
 			if (event.type == SDL_USEREVENT) {
                 timer_delay = anySpritesMoving(letters) ? 10 : 100;
                 moveSprites(&screen, letters, letterSpeed);
                 timer = SDL_AddTimer(timer_delay, TimerCallback, NULL);
 					break;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-		printf("mouse click\n");
+		//printf("mouse click\n");
                 clickDetect(event.button.button, event.button.x,
                             event.button.y, screen, *head, letters);
             } else if (event.type == SDL_KEYUP) {
-		printf("key press\n");
+		//printf("key press\n");
                 handleKeyboardEvent(&event, *head, letters);
             } else if (event.type == SDL_QUIT) {
 					done=1;
