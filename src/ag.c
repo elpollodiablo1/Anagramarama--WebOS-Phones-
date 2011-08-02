@@ -1786,8 +1786,8 @@ int timer_delay = 20;
 		}
 
 		while (SDL_WaitEvent(&event)){
-			printf("Inside Wait Event");
-			/*if (event.type == SDL_USEREVENT) {
+			printf("Inside Wait Event\n");
+			if (event.type == SDL_USEREVENT) {
                 timer_delay = anySpritesMoving(letters) ? 10 : 100;
                 moveSprites(&screen, letters, letterSpeed);
                 timer = SDL_AddTimer(timer_delay, TimerCallback, NULL);
@@ -1805,7 +1805,7 @@ int timer_delay = 20;
 	    } //else if (event.type == SDL_QUIT) {
 		//			done=1;
                 //break;
-	    //}*/
+	    //}
             moveSprites(&screen, letters, letterSpeed);
                 }
         }
