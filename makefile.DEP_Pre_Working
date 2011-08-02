@@ -1,6 +1,6 @@
 SDL_LIBS =-L%PALMPDK%\device\lib
 CFLAGS2=-Wall -O2 -I. -I%PALMPDK%\include Dmain=SDL_main -I%PALMPDK%\include\SDL
-LIBS=-lSDL -lpdl -lSLD_mixer -lSDLmain -lSDL_image
+LIBS=-lSDL -lSDL_mixer -lpdl -lSDLmain -lSDL_image
 MORELIBS=-Wl,--allow-shlib-undefined $(LIBS)
 TOOLPREFIX=arm-none-linux-gnueabi-
 CC=$(TOOLPREFIX)gcc
