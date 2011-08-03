@@ -1834,9 +1834,9 @@ struct sprite* letters = NULL;
 
 	// buffer sounds
 	int audio_rate = MIX_DEFAULT_FREQUENCY;
-	Uint16 audio_format = AUDIO_S16;
-	int audio_channels = 1;
-	int audio_buffers = 256;
+	Uint16 audio_format =MIX_DEFAULT_FORMAT; // AUDIO_S16;
+	int audio_channels = 2;
+	int audio_buffers = 512;
 
 
 	// seed the random generator
